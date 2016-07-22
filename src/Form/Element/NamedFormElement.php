@@ -125,7 +125,7 @@ abstract class NamedFormElement extends FormElement
      *
      * @return $this
      */
-    public function setName($name)
+    protected function setName($name)
     {
         $this->name = $name;
 
@@ -501,7 +501,8 @@ abstract class NamedFormElement extends FormElement
                 if ($i === $count) {
                     break;
                 } elseif (is_null($relatedModel)) {
-                    throw new LogicException("Field «{$this->getPath()}» can't be mapped to relations of model ".get_class($model).'. Probably some dot delimeted segment is not a supported relation type');
+                    throw new LogicException("Field [{$this->getPath()}] can't be mapped to relations of model [".get_class($model).']. 
+                        Probably some dot delimeted segment is not a supported relation type');
                 }
             }
 
