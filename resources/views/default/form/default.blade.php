@@ -5,5 +5,5 @@
 
 	@include(AdminTemplate::getViewPath('form.partials.elements'), ['items' => $items])
 
-	{!! $buttons->render() !!}
+	{!! is_null($buttons) ? '' : $buttons->render() !!}
 </form>

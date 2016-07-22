@@ -106,6 +106,7 @@ abstract class NamedFormElement extends FormElement
         $this->path = $path;
 
         $parts = explode('.', $path);
+
         $this->setName($this->composeName($parts));
         $this->setAttribute(end($parts));
 
@@ -415,26 +416,24 @@ abstract class NamedFormElement extends FormElement
      */
     public function resolvePath()
     {
-        $model = $this->getModel();
+        /** @var Model $model */
+        $model     = $this->getModel();
         $relations = explode('.', $this->getPath());
-        $count = count($relations);
+        $count     = count($relations);
+
+        if ($count === 1) {
+            return $model;
+        }
 
         foreach ($relations as $relation) {
-            if ($count === 1) {
-                return $model->getModel();
-            }
-
-            if ($model->exists() && $model->{$relation} instanceof Model) {
-                $model = $model->{$relation};
-                if ($model != null) {
-                    $count--;
+            if ($model->exists && $model->{$relation} instanceof Model) {
+                if (! is_null($model = $model->{$relation})) {
                     continue;
                 }
             }
 
             if ($model->{$relation}() instanceof BelongsTo) {
                 $model = $model->{$relation}()->getModel();
-                $count--;
                 continue;
             }
 
