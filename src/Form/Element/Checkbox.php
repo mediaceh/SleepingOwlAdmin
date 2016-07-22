@@ -8,7 +8,7 @@ class Checkbox extends NamedFormElement
 {
     public function save()
     {
-        $name = $this->getName();
+        $name = $this->getPath();
         if (! Request::has($name)) {
             Request::merge([$name => 0]);
         }

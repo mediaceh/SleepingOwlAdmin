@@ -8,7 +8,7 @@ class Images extends Image
 {
     public function save()
     {
-        $name = $this->getName();
+        $name = $this->getPath();
         $value = Request::input($name, '');
 
         if (! empty($value)) {

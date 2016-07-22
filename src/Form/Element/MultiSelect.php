@@ -23,7 +23,7 @@ class MultiSelect extends Select
      */
     public function getName()
     {
-        return $this->name.'[]';
+        return parent::getName().'[]';
     }
 
     /**
@@ -85,7 +85,7 @@ class MultiSelect extends Select
     public function toArray()
     {
         $attributes = [
-            'id' => $this->getName(),
+            'id' => $this->getPath(),
             'class' => 'form-control input-select',
             'multiple',
         ];

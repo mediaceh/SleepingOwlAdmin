@@ -337,7 +337,7 @@ class Select extends NamedFormElement
     public function toArray()
     {
         $attributes = [
-            'id' => $this->getName(),
+            'id' => $this->getPath(),
             'size' => 2,
             'data-select-type' => 'single',
             'class' => 'form-control input-select',

@@ -66,10 +66,6 @@ abstract class NamedFormElement extends FormElement
         $this->setPath($path);
         $this->setLabel($label);
 
-        $parts = explode('.', $path);
-        $this->setName($this->composeName($parts));
-        $this->setAttribute(end($parts));
-
         parent::__construct();
     }
 
@@ -108,6 +104,10 @@ abstract class NamedFormElement extends FormElement
     public function setPath($path)
     {
         $this->path = $path;
+
+        $parts = explode('.', $path);
+        $this->setName($this->composeName($parts));
+        $this->setAttribute(end($parts));
 
         return $this;
     }
@@ -289,7 +289,7 @@ abstract class NamedFormElement extends FormElement
         $messages = parent::getValidationMessages();
 
         foreach ($this->validationMessages as $rule => $message) {
-            $messages[$this->getName().'.'.$rule] = $message;
+            $messages[$this->getPath().'.'.$rule] = $message;
         }
 
         return $messages;
@@ -423,9 +423,10 @@ abstract class NamedFormElement extends FormElement
             if ($count === 1) {
                 return $model->getModel();
             }
-            if($model->exists() && $model->{$relation} instanceof Model){
+
+            if ($model->exists() && $model->{$relation} instanceof Model) {
                 $model = $model->{$relation};
-                if($model != null){
+                if ($model != null) {
                     $count--;
                     continue;
                 }
@@ -439,7 +440,8 @@ abstract class NamedFormElement extends FormElement
 
             break;
         }
-        throw new LogicException("Can not resolve path for field '{$this->getPath()}'. Probably relation definition is incorrect");
+
+        throw new LogicException("Can not resolve path for field [{$this->getPath()}]. Probably relation definition is incorrect");
     }
 
     /**
