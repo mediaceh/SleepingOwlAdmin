@@ -2,10 +2,7 @@
 
 namespace SleepingOwl\Admin\Contracts;
 
-interface Initializable
+interface Initializable extends \KodiComponents\Support\Contracts\Initializable
 {
-    /**
-     * Initialize class.
-     */
-    public function initialize();
+
 }

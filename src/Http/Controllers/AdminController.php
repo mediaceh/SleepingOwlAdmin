@@ -204,7 +204,7 @@ class AdminController extends Controller
                 ]);
             }
 
-            $editForm->saveForm($model);
+            $editForm->saveForm();
 
             $model->fireEvent('updated', false, $item);
         }

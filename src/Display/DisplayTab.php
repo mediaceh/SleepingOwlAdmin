@@ -199,28 +199,24 @@ class DisplayTab implements TabInterface, DisplayInterface, FormInterface
     }
 
     /**
-     * @param ModelConfigurationInterface $model
-     *
      * @return Validator|null
      */
-    public function validateForm(ModelConfigurationInterface $model)
+    public function validateForm()
     {
         if ($this->getContent() instanceof FormInterface) {
-            return $this->getContent()->validateForm($model);
+            return $this->getContent()->validateForm();
         }
     }
 
     /**
      * Save model.
      *
-     * @param ModelConfigurationInterface $model
-     *
      * @return $this
      */
-    public function saveForm(ModelConfigurationInterface $model)
+    public function saveForm()
     {
         if ($this->getContent() instanceof FormInterface) {
-            $this->getContent()->saveForm($model);
+            $this->getContent()->saveForm();
         }
 
         return $this;

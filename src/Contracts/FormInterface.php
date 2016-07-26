@@ -19,16 +19,12 @@ interface FormInterface extends FormElementInterface
     public function setId($id);
 
     /**
-     * @param ModelConfigurationInterface $model
-     *
      * @return \Illuminate\Contracts\Validation\Validator|null
      */
-    public function validateForm(ModelConfigurationInterface $model);
+    public function validateForm();
 
     /**
      * Save model.
-     *
-     * @param ModelConfigurationInterface $model
      */
-    public function saveForm(ModelConfigurationInterface $model);
+    public function saveForm();
 }
