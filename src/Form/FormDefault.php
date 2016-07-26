@@ -44,17 +44,6 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
      */
     protected $repository;
 
-    /**
-     * Form action url.
-     * @var string
-     */
-    protected $action;
-
-    /**
-     * Form related model instance.
-     * @var Model
-     */
-    protected $model;
 
     /**
      * Currently loaded model id.
@@ -82,6 +71,14 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
         );
 
         $this->initializePackage();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isInitialized()
+    {
+        return $this->initialized;
     }
 
     /**
@@ -130,6 +127,12 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
      */
     public function setButtons(FormButtonsInterface $buttons)
     {
+        if ($this->isInitialized()) {
+            $buttons->setModelConfiguration(
+                $this->getModelConfiguration()
+            );
+        }
+
         $this->buttons = $buttons;
 
         return $this;
@@ -164,25 +167,13 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
     }
 
     /**
-     * @return string
-     */
-    public function getAction()
-    {
-        return $this->action;
-    }
-
-    /**
      * @param string $action
      *
      * @return $this
      */
     public function setAction($action)
     {
-        if (is_null($this->action)) {
-            $this->action = $action;
-        }
-
-        $this->setHtmlAttribute('action', $this->action);
+        $this->setHtmlAttribute('action', $action);
 
         return $this;
     }
@@ -190,7 +181,7 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
     /**
      * @return string
      */
-    public function getClass()
+    public function getModelClass()
     {
         return $this->class;
     }
@@ -258,7 +249,6 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
     public function setId($id)
     {
         if (is_null($this->id) and ! is_null($id) and ($model = $this->getRepository()->find($id))) {
-            $this->id = $id;
             $this->setModel($model);
         }
     }
@@ -287,7 +277,7 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
      */
     public function setModel(Model $model)
     {
-        $this->model = $model;
+        $this->id = $model->getKey();
 
         parent::setModel($model);
 
@@ -298,15 +288,9 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
 
     /**
      * Save instance.
-     *
-     * @param ModelConfigurationInterface $modelConfiguration
      */
-    public function saveForm(ModelConfigurationInterface $modelConfiguration)
+    public function saveForm()
     {
-        if ($modelConfiguration !== $this->getModelConfiguration()) {
-            return;
-        }
-
         parent::save();
 
         $this->saveBelongsToRelations();
@@ -322,10 +306,10 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
     {
         $model = $this->getModel();
 
-        foreach ($model->getRelations() as $name => $relation) {
-            if ($model->{$name}() instanceof BelongsTo && !is_null($relation)) {
-                $relation->save();
-                $model->{$name}()->associate($relation);
+        foreach ($model->getRelations() as $name => $related) {
+            if (($relation = $model->{$name}()) instanceof BelongsTo && !is_null($related)) {
+                $related->save();
+                $model->{$name}()->associate($related);
             }
         }
     }
@@ -334,28 +318,22 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
     {
         $model = $this->getModel();
 
-        foreach ($model->getRelations() as $name => $relation) {
-            if ($model->{$name}() instanceof HasOneOrMany && !is_null($relation)) {
-                if (is_array($relation) || $relation instanceof \Traversable) {
-                    $model->{$name}()->saveMany($relation);
+        foreach ($model->getRelations() as $name => $related) {
+            if (($relation = $model->{$name}()) instanceof HasOneOrMany && !is_null($related)) {
+                if (is_array($related) || $related instanceof \Traversable || $related instanceof Collection) {
+                    $relation->saveMany($related);
                 } else {
-                    $model->{$name}()->save($relation);
+                    $relation->save($related);
                 }
             }
         }
     }
 
     /**
-     * @param ModelConfigurationInterface $modelConfiguration
-     *
      * @return \Illuminate\Contracts\Validation\Validator|null
      */
-    public function validateForm(ModelConfigurationInterface $modelConfiguration)
+    public function validateForm()
     {
-        if ($modelConfiguration !== $this->getModelConfiguration()) {
-            return;
-        }
-
         $data = Request::all();
 
         $verifier = app('validation.presence');
