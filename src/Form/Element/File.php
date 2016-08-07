@@ -38,7 +38,7 @@ class File extends NamedFormElement implements WithRoutesInterface
                     $item = $model->getRepository()->find($id);
                     if (is_null($item) || ! $model->isEditable($item)) {
                         return new JsonResponse([
-                            'message' => 'Access denied'
+                            'message' => 'Access denied',
                         ], 403);
                     }
 
@@ -54,13 +54,15 @@ class File extends NamedFormElement implements WithRoutesInterface
                 }
 
                 $messages = [];
-                $labels   = [];
+
+                $labels = [];
                 $rules = static::defaultUploadValidationRules();
 
                 if (! is_null($element = $form->getElement($field))) {
-                    $rules    = $element->getUploadValidationRules();
+                    $rules = $element->getUploadValidationRules();
                     $messages = $element->getUploadValidationMessages();
-                    $labels   = $element->getUploadValidationLabels();
+                    $labels = $element->getUploadValidationLabels();
+
                 }
 
                 $validator = Validator::make($request->all(), $rules, $messages, $labels);
@@ -70,7 +72,7 @@ class File extends NamedFormElement implements WithRoutesInterface
                 if ($validator->fails()) {
                     return new JsonResponse([
                         'message' => 'Validation error',
-                        'errors' => $validator->errors()->get('file')
+                        'errors' => $validator->errors()->get('file'),
                     ], 400);
                 }
 
@@ -79,11 +81,11 @@ class File extends NamedFormElement implements WithRoutesInterface
                 /** @var File $element */
                 if (! is_null($element = $form->getElement($field))) {
                     $filename = $element->getUploadFileName($file);
-                    $path     = $element->getUploadPath($file);
+                    $path = $element->getUploadPath($file);
                     $settings = $element->getUploadSettings();
                 } else {
                     $filename = static::defaultUploadFilename($file);
-                    $path     = static::defaultUploadPath($file);
+                    $path = static::defaultUploadPath($file);
                     $settings = [];
                 }
 
@@ -116,6 +118,16 @@ class File extends NamedFormElement implements WithRoutesInterface
     protected static function validate(\Illuminate\Validation\Validator $validator)
     {
 
+    }
+
+    /**
+     * @param UploadedFile $file
+     *
+     * @return string
+     */
+    protected static function defaultUploadFilename(UploadedFile $file)
+    {
+        return md5(time().$file->getClientOriginalName()).'.'.$file->getClientOriginalExtension();
     }
 
     /**
@@ -168,7 +180,7 @@ class File extends NamedFormElement implements WithRoutesInterface
      */
     protected $uploadValidationRules = ['required', 'file'];
 
-        /**
+    /**
      * @return array
      */
     public function getUploadValidationMessages()
@@ -281,7 +293,7 @@ class File extends NamedFormElement implements WithRoutesInterface
      */
     public function addValidationRule($rule, $message = null)
     {
-        $uploadRules = ['file', 'image', 'mime', 'size', 'dimensions'];
+        $uploadRules = ['file', 'image', 'mime', 'size', 'dimensions', 'max', 'min', 'between'];
 
         foreach ($uploadRules as $uploadRule) {
             if (strpos($rule, $uploadRule) !== false) {
@@ -296,5 +308,29 @@ class File extends NamedFormElement implements WithRoutesInterface
         }
 
         return parent::addValidationRule($rule, $message);
+    }
+
+    /**
+     * @param int $size Max size in kilobytes
+     *
+     * @return $this
+     */
+    public function maxSize($size)
+    {
+        $this->addValidationRule('max:'.(int) $size);
+
+        return $this;
+    }
+
+    /**
+     * @param int $size Max size in kilobytes
+     *
+     * @return $this
+     */
+    public function minSize($size)
+    {
+        $this->addValidationRule('min:'.(int) $size);
+
+        return $this;
     }
 }
