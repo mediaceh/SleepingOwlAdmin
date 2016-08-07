@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 class AdminSectionsServiceProvider extends ServiceProvider
 {
     /**
-     * @var array
+     * @var array  Associative array in form of: Model::class => Section::class
      */
     protected $sections = [];
 
@@ -23,14 +23,6 @@ class AdminSectionsServiceProvider extends ServiceProvider
                 $admin->register(new $section($model));
             }
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function sections()
-    {
-        return $this->sections;
     }
 
     /**

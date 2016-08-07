@@ -3,13 +3,12 @@
 namespace SleepingOwl\Admin\Display;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Routing\Router;
 use Request;
-use Route;
 use SleepingOwl\Admin\Contracts\Display\DisplayExtensionInterface;
 use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
 use SleepingOwl\Admin\Contracts\TreeRepositoryInterface;
 use SleepingOwl\Admin\Contracts\WithRoutesInterface;
-use SleepingOwl\Admin\Display\Extension\Tree;
 use SleepingOwl\Admin\Repository\TreeRepository;
 
 /**
@@ -18,11 +17,15 @@ use SleepingOwl\Admin\Repository\TreeRepository;
  */
 class DisplayTree extends Display implements WithRoutesInterface
 {
-    public static function registerRoutes()
+
+    /**
+     * @param Router $router
+     */
+    public static function registerRoutes(Router $router)
     {
         $routeName = 'admin.display.tree.reorder';
-        if (! Route::has($routeName)) {
-            Route::post('{adminModel}/reorder', ['as' => $routeName, function (ModelConfigurationInterface $model) {
+        if (! $router->has($routeName)) {
+            $router->post('{adminModel}/reorder', ['as' => $routeName, function (ModelConfigurationInterface $model) {
                 $model->fireDisplay()->getRepository()->reorder(
                     Request::input('data')
                 );
@@ -46,7 +49,7 @@ class DisplayTree extends Display implements WithRoutesInterface
     protected $reorderable = true;
 
     /**
-     * @var string
+     * @var string|callable
      */
     protected $value = 'title';
 
@@ -80,7 +83,6 @@ class DisplayTree extends Display implements WithRoutesInterface
      */
     protected $collection;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -108,7 +110,7 @@ class DisplayTree extends Display implements WithRoutesInterface
     }
 
     /**
-     * @param string $value
+     * @param string|callable $value
      *
      * @return $this
      */
