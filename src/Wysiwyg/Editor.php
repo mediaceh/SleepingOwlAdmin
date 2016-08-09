@@ -2,9 +2,10 @@
 
 namespace SleepingOwl\Admin\Wysiwyg;
 
+use Illuminate\Config\Repository;
 use KodiCMS\Assets\Contracts\MetaInterface;
 use KodiCMS\Assets\Package;
-use Illuminate\Contracts\Support\Arrayable;
+use Meta;
 use SleepingOwl\Admin\Contracts\Wysiwyg\WysiwygEditorInterface;
 use SleepingOwl\Admin\Contracts\Wysiwyg\WysiwygFilterInterface;
 
@@ -12,7 +13,7 @@ use SleepingOwl\Admin\Contracts\Wysiwyg\WysiwygFilterInterface;
  * @method Editor js($handle = false, $src = null, $dependency = null, $footer = false)
  * @method Editor css($handle = null, $src = null, $dependency = null, array $attributes = [])
  */
-final class Editor implements WysiwygEditorInterface, Arrayable
+final class Editor implements WysiwygEditorInterface
 {
     /**
      * @var string
@@ -30,9 +31,9 @@ final class Editor implements WysiwygEditorInterface, Arrayable
     private $filter;
 
     /**
-     * @var array
+     * @var Repository
      */
-    private $config = [];
+    private $config;
 
     /**
      * @var bool
@@ -61,9 +62,9 @@ final class Editor implements WysiwygEditorInterface, Arrayable
     {
         $this->id = $id;
         $this->package = $package;
-        $this->name = $name;
-        $this->filter = $filter;
-        $this->config = $config;
+        $this->name = is_null($name) ? studly_case($id) : $name;
+        $this->filter = is_null($filter) ? $this->loadDefaultFilter() : $filter;
+        $this->config = new Repository($config);
         $this->meta = $meta;
     }
 
@@ -100,11 +101,11 @@ final class Editor implements WysiwygEditorInterface, Arrayable
     }
 
     /**
-     * @return array
+     * @return Repository
      */
     public function getConfig()
     {
-        return (array) $this->config;
+        return $this->config;
     }
 
     /**

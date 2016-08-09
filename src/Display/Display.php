@@ -289,7 +289,8 @@ abstract class Display implements DisplayInterface, AssetsInterface
     }
 
     /**
-     * @param string|View $view
+     * @param string|\Illuminate\View\View $view
+	 *
      * @return $this
      */
     public function setView($view)

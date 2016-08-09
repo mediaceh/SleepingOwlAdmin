@@ -8,6 +8,7 @@ use KodiCMS\Assets\Package;
 use SleepingOwl\Admin\Contracts\TemplateInterface;
 use SleepingOwl\Admin\Contracts\Wysiwyg\ManagerInterface;
 use SleepingOwl\Admin\Wysiwyg\Manager;
+use SleepingOwl\Admin\Contracts\Wysiwyg\WysiwygEditorInterface;
 
 class Wysiwyg extends NamedFormElement
 {
@@ -65,11 +66,12 @@ class Wysiwyg extends NamedFormElement
 
     public function initialize()
     {
+		/** @var WysiwygEditorInterface $editor */
         $editor = $this->wysiwyg->getEditor($this->getEditor());
 
         $this->wysiwyg->loadEditor($this->getEditor());
 
-        $this->parameters = array_merge($editor->getConfig(), $this->parameters);
+        $this->parameters = (array) $editor->getConfig()->set($this->parameters);
     }
 
     /**
