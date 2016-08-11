@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateUploadTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('sleeping_owl_upload', function (Blueprint $table) { // ????
+            $table->increments('id');
+			$table->string('file')->unique();
+			$table->string('filename');
+            $table->string('mime');
+            $table->string('ext');
+            $table->integer('size');
+
+            $table->timestamps();
+
+            $table->index('file');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('sleeping_owl_upload');
+    }
+}

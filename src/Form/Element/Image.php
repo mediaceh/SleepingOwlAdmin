@@ -2,8 +2,8 @@
 
 namespace SleepingOwl\Admin\Form\Element;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Validator;
+use SleepingOwl\Admin\Model\Upload;
 
 class Image extends File
 {
@@ -13,9 +13,14 @@ class Image extends File
     protected static $route = 'image';
 
     /**
+     * @var array
+     */
+    protected $uploadValidationRules = ['required', 'image'];
+
+    /**
      * @param Validator $validator
      */
-    protected static function validate(Validator $validator)
+    public function customValidation(Validator $validator)
     {
         $validator->after(function ($validator) {
             /** @var \Illuminate\Http\UploadedFile $file */
@@ -30,36 +35,35 @@ class Image extends File
     }
 
     /**
-     * @param UploadedFile $file
-     * @param string $path
-     * @param string $filename
-     * @param array $settings
+     * @param Upload $file
      */
-    protected static function saveFile(UploadedFile $file, $path, $filename, array $settings)
+    public function saveFile(Upload $file)
     {
+        $settings = $this->getUploadSettings();
+
         if (
             class_exists('Intervention\Image\Facades\Image')
             and
-            (bool) getimagesize($file->getRealPath())
+            (bool) getimagesize($file->file_path)
         ) {
-            $image = \Intervention\Image\Facades\Image::make($file);
+            $image = \Intervention\Image\Facades\Image::make($file->file_path);
 
             foreach ($settings as $method => $args) {
                 call_user_func_array([$image, $method], $args);
             }
 
-            return $image->save($path.'/'.$filename);
+            $image->save();
         }
 
-        $file->move($path, $filename);
+        parent::saveFile($file);
     }
 
     /**
-     * @param UploadedFile $file
+     * @param Upload $file
      *
      * @return string
      */
-    protected static function defaultUploadPath(UploadedFile $file)
+    public function defaultUploadPath(Upload $file)
     {
         return config('sleeping_owl.imagesUploadDirectory', 'images/uploads');
     }
@@ -67,15 +71,10 @@ class Image extends File
     /**
      * @return array
      */
-    protected static function defaultUploadValidationRules()
+    public function defaultUploadValidationRules()
     {
         return [
             'file' => 'image',
         ];
     }
-
-    /**
-     * @var array
-     */
-    protected $uploadValidationRules = ['required', 'image'];
 }
