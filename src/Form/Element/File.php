@@ -53,6 +53,8 @@ class File extends NamedFormElement implements WithRoutesInterface
 
     /**
      * @param Upload $file
+     *
+     * @return string
      */
     public function saveFile(Upload $file)
     {
@@ -60,6 +62,8 @@ class File extends NamedFormElement implements WithRoutesInterface
         $path = $this->getUploadPath($file);
 
         $file->move($path, $filename);
+
+        return $path.'/'.$filename;
     }
 
     /**
@@ -261,10 +265,10 @@ class File extends NamedFormElement implements WithRoutesInterface
      */
     protected function setValue(Model $model, $attribute, $value)
     {
-        $file = Upload::whereFile($value)->first();
+        $file = Upload::where('file', $value)->first();
 
         if (! is_null($file)) {
-            $this->saveFile($file);
+            $value = $this->saveFile($file);
         }
 
         parent::setValue($model, $attribute, $value);

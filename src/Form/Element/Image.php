@@ -36,6 +36,8 @@ class Image extends File
 
     /**
      * @param Upload $file
+     *
+     * @return string
      */
     public function saveFile(Upload $file)
     {
@@ -55,7 +57,7 @@ class Image extends File
             $image->save();
         }
 
-        parent::saveFile($file);
+        return parent::saveFile($file);
     }
 
     /**

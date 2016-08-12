@@ -2,7 +2,9 @@
 
 namespace SleepingOwl\Admin\Form\Element;
 
+use Illuminate\Database\Eloquent\Model;
 use Request;
+use SleepingOwl\Admin\Model\Upload;
 
 class Images extends Image
 {
@@ -19,6 +21,24 @@ class Images extends Image
 
         Request::merge([$name => $value]);
         parent::save();
+    }
+
+    /**
+     * @param Model  $model
+     * @param string $attribute
+     * @param array  $values
+     */
+    protected function setValue(Model $model, $attribute, $values)
+    {
+        foreach ($values as $i => $file) {
+            $file = Upload::whereFile($file)->first();
+
+            if (! is_null($file)) {
+                $values[$i] = $this->saveFile($file);
+            }
+        }
+
+        $model->setAttribute($attribute, $values);
     }
 
     /**
