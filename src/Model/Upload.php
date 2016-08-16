@@ -33,7 +33,7 @@ class Upload extends Model
             $file->size = $uploadedFile->getSize();
             $file->ext = $uploadedFile->getClientOriginalExtension();
             $file->mime = $uploadedFile->getMimeType();
-        }, 100);
+        }, -100);
     }
 
     /**
@@ -56,6 +56,16 @@ class Upload extends Model
 
         return true;
     }
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'file_path',
+        'file_url'
+    ];
 
     /**
      * @param string $directory

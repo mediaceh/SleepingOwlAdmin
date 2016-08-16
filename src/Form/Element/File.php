@@ -26,7 +26,7 @@ class File extends NamedFormElement implements WithRoutesInterface
         if (! $router->has($routeName)) {
             $router->post('{adminModel}/'.static::$route.'/{field}/{id?}', [
                 'as' => $routeName,
-                'uses' => 'SleepingOwl\Admin\Http\Controllers\UploadController@upload'
+                'uses' => 'SleepingOwl\Admin\Http\Controllers\UploadController@fromField'
             ]);
         }
     }

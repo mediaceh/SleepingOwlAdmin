@@ -2,6 +2,7 @@
 
 namespace SleepingOwl\Admin\Http\Controllers;
 
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -13,6 +14,39 @@ use Validator;
 
 class UploadController extends Controller
 {
+
+    /**
+     * @param Request $request
+     * @param Gate $gate
+     *
+     * @return JsonResponse
+     */
+    public function upload(Request $request, Gate $gate)
+    {
+        if ($gate->denies('upload-file')) {
+            return new JsonResponse([
+                'message' => trans('lang.message.access_denied'),
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), ['file' => 'required|file']);
+
+        if ($validator->fails()) {
+            return new JsonResponse([
+                'message' => trans('lang.message.validation_error'),
+                'errors' => $validator->errors()->get('file'),
+            ], 400);
+        }
+
+        $file = $request->file('file');
+
+        $uploadedFile = Upload::create([
+            'file' => $file,
+        ]);
+
+        return new JsonResponse($uploadedFile);
+    }
+
     /**
      * @param Request $request
      * @param ModelConfigurationInterface $model
@@ -21,7 +55,7 @@ class UploadController extends Controller
      *
      * @return JsonResponse
      */
-    public function upload(Request $request, ModelConfigurationInterface $model, $field, $id = null)
+    public function fromField(Request $request, ModelConfigurationInterface $model, $field, $id = null)
     {
         if (! is_null($id)) {
             $item = $model->getRepository()->find($id);
