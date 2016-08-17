@@ -140,11 +140,11 @@ class File extends NamedFormElement implements WithRoutesInterface
      */
     public function getUploadPath(Upload $file)
     {
-        if (! is_callable($this->uploadFileName)) {
-            return $this->defaultUploadPath($file);
+        if (! is_callable($this->uploadPath)) {
+            return static::defaultUploadPath($file);
         }
 
-        return call_user_func($this->uploadFileName, $file);
+        return call_user_func($this->uploadPath, $file);
     }
 
     /**
