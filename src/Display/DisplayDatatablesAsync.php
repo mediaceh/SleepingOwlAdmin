@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use SleepingOwl\Admin\Contracts\AdminInterface;
 use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
 use SleepingOwl\Admin\Contracts\RepositoryInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Display\Column\Control;
 use SleepingOwl\Admin\Display\Column\Email;
 use SleepingOwl\Admin\Display\Column\Link;
@@ -88,22 +89,20 @@ class DisplayDatatablesAsync extends DisplayDatatables implements WithRoutesInte
     /**
      * DisplayDatatablesAsync constructor.
      *
-     * @param AdminInterface $admin
-     * @param RepositoryInterface $repository
-     * @param Request $request
+     * @param MetaInterface $meta
      * @param Control $control
+     * @param Request $request
      * @param string|null $name
      * @param string|null $distinct
      */
-    public function __construct(AdminInterface $admin,
-                                RepositoryInterface $repository,
+    public function __construct(MetaInterface $meta,
                                 Control $control,
                                 Request $request,
                                 $name = null,
                                 $distinct = null
     )
     {
-        parent::__construct($admin, $repository, $control, $request);
+        parent::__construct($meta, $control, $request);
 
         $this->request = $request;
 
@@ -252,7 +251,7 @@ class DisplayDatatablesAsync extends DisplayDatatables implements WithRoutesInte
             foreach ($columns as $column) {
                 if (in_array(get_class($column), $this->searchableColumns)) {
                     $name = $column->getName();
-                    if ($this->repository->hasColumn($name)) {
+                    if ($this->getRepository()->hasColumn($name)) {
                         $query->orWhere($name, 'like', '%'.$search.'%');
                     }
                 }
@@ -274,7 +273,7 @@ class DisplayDatatablesAsync extends DisplayDatatables implements WithRoutesInte
             $columnFilter = array_get($this->getColumnFilters()->all(), $index);
 
             if (! is_null($columnFilter) && ! is_null($column)) {
-                $columnFilter->apply($this->repository, $column, $query, $search, $fullSearch);
+                $columnFilter->apply($column, $query, $search, $fullSearch);
             }
         }
     }

@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use SleepingOwl\Admin\Contracts\RepositoryInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Exceptions\Form\Element\SelectException;
 
@@ -67,17 +68,17 @@ class Select extends NamedFormElement
     protected $repository;
 
     /**
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      * @param RepositoryInterface $repository
      * @param string $path
      * @param string|null $label
      * @param array|Model $options
      */
-    public function __construct(TemplateInterface $template, RepositoryInterface $repository, $path, $label = null, $options = [])
+    public function __construct(MetaInterface $meta, RepositoryInterface $repository, $path, $label = null, $options = [])
     {
         $this->repository = $repository;
 
-        parent::__construct($template, $path, $label);
+        parent::__construct($meta, $path, $label);
 
         if (is_array($options)) {
             $this->setOptions($options);

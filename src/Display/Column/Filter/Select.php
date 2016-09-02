@@ -41,24 +41,6 @@ class Select extends BaseColumnFilter
      */
     protected $filterField = '';
 
-    /**
-     * @var RepositoryInterface
-     */
-    protected $repository;
-
-    /**
-     * Select constructor.
-     *
-     * @param TemplateInterface $template
-     * @param RepositoryInterface $repository
-     */
-    public function __construct(TemplateInterface $template, RepositoryInterface $repository)
-    {
-        parent::__construct($template);
-
-        $this->repository = $repository;
-    }
-
     public function initialize()
     {
         parent::initialize();
@@ -92,7 +74,6 @@ class Select extends BaseColumnFilter
         }
 
         $this->model = $model;
-        $this->repository->setModel($model);
 
         return $this;
     }
@@ -196,7 +177,6 @@ class Select extends BaseColumnFilter
     }
 
     /**
-     * @param RepositoryInterface  $repository
      * @param NamedColumnInterface $column
      * @param Builder              $query
      * @param string               $search
@@ -205,7 +185,6 @@ class Select extends BaseColumnFilter
      * @return void
      */
     public function apply(
-        RepositoryInterface $repository,
         NamedColumnInterface $column,
         Builder $query,
         $search,
@@ -220,6 +199,8 @@ class Select extends BaseColumnFilter
 
             return;
         }
+
+        $repository = $this->getModelConfiguration()->getRepository();
 
         $name = $column->getName();
         if ($repository->hasColumn($name)) {
@@ -236,14 +217,17 @@ class Select extends BaseColumnFilter
 
     protected function loadOptions()
     {
-        $key = $this->repository->getModel()->getKeyName();
-        $options = $this->repository->getQuery()->get()->lists($this->getDisplay(), $key);
+        $repository = $this->getModelConfiguration()->getRepository();
+
+        $key = $repository->getModel()->getKeyName();
+        $options = $repository->getQuery()->get()->lists($this->getDisplay(), $key);
 
         if ($options instanceof Collection) {
             $options = $options->all();
         }
 
-        $options = array_unique($options);
-        $this->setOptions($options);
+        $this->setOptions(
+            array_unique($options)
+        );
     }
 }

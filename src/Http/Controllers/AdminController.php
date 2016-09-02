@@ -276,8 +276,7 @@ class AdminController extends Controller
             abort(404);
         }
 
-        $repository = $model->getRepository();
-        $item = $repository->find($id);
+        $item = $model->getRepository()->find($id);
 
         if (is_null($item) || ! $model->isEditable($item)) {
             abort(404);

@@ -8,6 +8,7 @@ use Illuminate\Routing\Router;
 use SleepingOwl\Admin\Contracts\AdminInterface;
 use SleepingOwl\Admin\Contracts\Display\DisplayExtensionInterface;
 use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\TreeRepositoryInterface;
 use SleepingOwl\Admin\Contracts\WithRoutesInterface;
 use SleepingOwl\Admin\Display\Column\TreeControl;
@@ -28,7 +29,7 @@ class DisplayTree extends Display implements WithRoutesInterface
         $routeName = 'admin.display.tree.reorder';
         if (! $router->has($routeName)) {
             $router->post('{adminModel}/reorder', ['as' => $routeName, function (ModelConfigurationInterface $model, \Illuminate\Http\Request $request) {
-                $model->fireDisplay()->getRepository()->reorder(
+                $model->getRepository()->reorder(
                     $request->input('data')
                 );
             }]);
@@ -93,16 +94,15 @@ class DisplayTree extends Display implements WithRoutesInterface
     /**
      * DisplayTree constructor.
      *
-     * @param AdminInterface $admin
-     * @param TreeRepository $repository
+     * @param MetaInterface $meta
      * @param TreeControl $control
      * @param Request $request
      */
-    public function __construct(AdminInterface $admin, TreeRepository $repository, TreeControl $control, Request $request)
+    public function __construct(MetaInterface $meta, TreeControl $control, Request $request)
     {
         $this->control = $control;
 
-        parent::__construct($admin, $repository);
+        parent::__construct($meta);
 
         // TODO: move tree building to extension
         // $this->extend('tree', new Tree());
@@ -257,7 +257,7 @@ class DisplayTree extends Display implements WithRoutesInterface
      */
     public function render()
     {
-        return $this->template->view($this->getView(), $this->toArray());
+        return $this->getTemplate()->view($this->getView(), $this->toArray());
     }
 
     /**

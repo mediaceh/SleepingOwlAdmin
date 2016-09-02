@@ -5,6 +5,7 @@ namespace SleepingOwl\Admin\Display\Column\Filter;
 use KodiComponents\Support\HtmlAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
+use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Traits\Assets;
 use SleepingOwl\Admin\Traits\SqlQueryOperators;
@@ -25,6 +26,11 @@ abstract class BaseColumnFilter implements Renderable, ColumnFilterInterface, Ar
     protected $template;
 
     /**
+     * @var ModelConfigurationInterface
+     */
+    protected $modelConfiguration;
+
+    /**
      * BaseColumnFilter constructor.
      *
      * @param TemplateInterface $template
@@ -35,6 +41,28 @@ abstract class BaseColumnFilter implements Renderable, ColumnFilterInterface, Ar
         $this->initializePackage(
             $this->template->meta()
         );
+    }
+
+
+
+    /**
+     * @param ModelConfigurationInterface $model
+     *
+     * @return $this
+     */
+    public function setModelConfiguration(ModelConfigurationInterface $model)
+    {
+        $this->modelConfiguration = $model;
+
+        return $this;
+    }
+
+    /**
+     * @return ModelConfigurationInterface
+     */
+    public function getModelConfiguration()
+    {
+        return $this->modelConfiguration;
     }
 
     /**

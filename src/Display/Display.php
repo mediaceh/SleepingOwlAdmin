@@ -13,6 +13,8 @@ use SleepingOwl\Admin\Contracts\Initializable;
 use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
 use SleepingOwl\Admin\Contracts\RepositoryInterface;
 use SleepingOwl\Admin\Contracts\AdminInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
+use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Display\Extension\Actions;
 use SleepingOwl\Admin\Display\Extension\Apply;
 use SleepingOwl\Admin\Display\Extension\Filters;
@@ -54,29 +56,9 @@ abstract class Display implements DisplayInterface
     protected $title;
 
     /**
-     * @var RepositoryInterface
-     */
-    protected $repository;
-
-    /**
      * @var DisplayExtensionInterface[]|Collection
      */
     protected $extensions;
-
-    /**
-     * @var bool
-     */
-    protected $initialized = false;
-
-    /**
-     * @var TemplateInterface
-     */
-    protected $template;
-
-    /**
-     * @var AdminInterface
-     */
-    protected $admin;
 
     /**
      * @var ModelConfigurationInterface
@@ -84,35 +66,26 @@ abstract class Display implements DisplayInterface
     protected $modelConfiguration;
 
     /**
+     * @var MetaInterface
+     */
+    protected $meta;
+
+    /**
      * Display constructor.
      *
-     * @param AdminInterface $admin
-     * @param RepositoryInterface $repository
+     * @param MetaInterface $meta
      */
-    public function __construct(AdminInterface $admin, RepositoryInterface $repository)
+    public function __construct(MetaInterface $meta)
     {
         $this->extensions = new Collection();
-        $this->template = $admin->template();
-        $this->repository = $repository;
+        $this->meta = $meta;
 
         $this->extend('actions', new Actions());
         $this->extend('filters', new Filters());
         $this->extend('apply', new Apply());
         $this->extend('scopes', new Scopes());
 
-        $this->initializePackage(
-            $this->template->meta()
-        );
-
-        $this->admin = $admin;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isInitialized()
-    {
-        return $this->initialized;
+        $this->initializePackage($meta);
     }
 
     /**
@@ -143,7 +116,7 @@ abstract class Display implements DisplayInterface
      */
     public function getRepository()
     {
-        return $this->repository;
+        return $this->getModelConfiguration()->getRepository();
     }
 
     /**
@@ -163,11 +136,7 @@ abstract class Display implements DisplayInterface
      */
     public function initialize()
     {
-        if ($this->isInitialized()) {
-            return;
-        }
-
-        $this->repository->with($this->with);
+        $this->getRepository()->with($this->with);
 
         $this->extensions->each(function (DisplayExtensionInterface $extension) {
             if ($extension instanceof Initializable) {
@@ -175,10 +144,10 @@ abstract class Display implements DisplayInterface
             }
 
             if ($extension instanceof Placable) {
-                $template = $this->template->getViewPath($this->getView());
+                $template = $this->getTemplate()->getViewPath($this->getView());
 
                 view()->composer($template, function (\Illuminate\View\View $view) use ($extension) {
-                    $html = $this->template->view($extension->getView(), $extension->toArray())->render();
+                    $html = $this->getTemplate()->view($extension->getView(), $extension->toArray())->render();
 
                     if (! empty($html)) {
                         $view->getFactory()->inject($extension->getPlacement(), $html);
@@ -188,10 +157,8 @@ abstract class Display implements DisplayInterface
         });
 
         $this->includePackage(
-            $this->template->meta()
+            $this->meta
         );
-
-        $this->initialized = true;
     }
 
     /**
@@ -292,9 +259,9 @@ abstract class Display implements DisplayInterface
     /**
      * @return TemplateInterface
      */
-    public function template()
+    public function getTemplate()
     {
-        return $this->template;
+        return $this->getModelConfiguration()->getTemplate();
     }
 
     /**
@@ -313,7 +280,6 @@ abstract class Display implements DisplayInterface
     public function setModelConfiguration(ModelConfigurationInterface $model)
     {
         $this->modelConfiguration = $model;
-        $this->repository->setClass($model->getClass());
 
         return $this;
     }

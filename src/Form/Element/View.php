@@ -4,6 +4,7 @@ namespace SleepingOwl\Admin\Form\Element;
 
 use Closure;
 use Illuminate\Http\Request;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 
 class View extends Custom
@@ -19,17 +20,17 @@ class View extends Custom
     protected $data = [];
 
     /**
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      * @param string $view
      * @param array $data
      * @param Closure $callback
      */
-    public function __construct(TemplateInterface $template, $view, array $data = [], Closure $callback = null)
+    public function __construct(MetaInterface $meta, $view, array $data = [], Closure $callback = null)
     {
         $this->setView($view);
         $this->setData($data);
 
-        parent::__construct($template, $callback);
+        parent::__construct($meta, $callback);
     }
 
     /**

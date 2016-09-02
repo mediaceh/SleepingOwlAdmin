@@ -3,6 +3,7 @@
 namespace SleepingOwl\Admin\Form\Element;
 
 use Illuminate\Database\Eloquent\Model;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Contracts\Wysiwyg\WysiwygEditorInterface;
 use SleepingOwl\Admin\Contracts\Wysiwyg\WysiwygMangerInterface;
@@ -36,17 +37,17 @@ class Wysiwyg extends NamedFormElement
     protected $manger;
 
     /**
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      * @param WysiwygMangerInterface $manger
      * @param string $path
      * @param string|null $label
      * @param string|null $editor
      */
-    public function __construct(TemplateInterface $template, WysiwygMangerInterface $manger, $path, $label = null, $editor = null)
+    public function __construct(MetaInterface $meta, WysiwygMangerInterface $manger, $path, $label = null, $editor = null)
     {
         $this->manger = $manger;
 
-        parent::__construct($template, $path, $label);
+        parent::__construct($meta, $path, $label);
 
         if (is_null($editor)) {
             $editor = $this->manger->getDefaultEditorId();

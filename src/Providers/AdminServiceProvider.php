@@ -52,7 +52,6 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             $this->registerCustomRoutes();
             $this->registerDefaultRoutes();
-            $this->registerNavigationFile();
 
             $this->app['sleeping_owl']->initialize();
         });
@@ -206,16 +205,5 @@ class AdminServiceProvider extends ServiceProvider
         ], function ($route) use ($callback) {
             call_user_func($callback, $route);
         });
-    }
-
-    protected function registerNavigationFile()
-    {
-        if (file_exists($navigation = $this->getBootstrapPath('navigation.php'))) {
-            $items = include $navigation;
-
-            if (is_array($items)) {
-                $this->app['sleeping_owl.navigation']->setFromArray($items);
-            }
-        }
     }
 }

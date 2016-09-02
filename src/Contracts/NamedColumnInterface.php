@@ -15,4 +15,16 @@ interface NamedColumnInterface
      * @return $this
      */
     public function setName($name);
+
+    /**
+     * @param ModelConfigurationInterface $model
+     *
+     * @return $this
+     */
+    public function setModelConfiguration(ModelConfigurationInterface $model);
+
+    /**
+     * @return ModelConfigurationInterface
+     */
+    public function getModelConfiguration();
 }

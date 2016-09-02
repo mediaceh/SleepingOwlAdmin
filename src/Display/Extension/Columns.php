@@ -205,6 +205,6 @@ class Columns extends Extension implements Initializable, Renderable
         $params = $this->toArray();
         $params['collection'] = $this->getDisplay()->getCollection();
 
-        return $this->getDisplay()->template()->view($this->getView(), $params)->render();
+        return $this->getDisplay()->getTemplate()->view($this->getView(), $params)->render();
     }
 }

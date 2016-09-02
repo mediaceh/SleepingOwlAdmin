@@ -48,7 +48,6 @@ class Text extends BaseColumnFilter
     }
 
     /**
-     * @param RepositoryInterface  $repository
      * @param NamedColumnInterface $column
      * @param Builder              $query
      * @param string               $search
@@ -57,7 +56,6 @@ class Text extends BaseColumnFilter
      * @return void
      */
     public function apply(
-        RepositoryInterface $repository,
         NamedColumnInterface $column,
         Builder $query,
         $search,
@@ -69,7 +67,7 @@ class Text extends BaseColumnFilter
 
         $name = $column->getName();
 
-        if ($repository->hasColumn($name)) {
+        if ($column->getModelConfiguration()->getRepository()->hasColumn($name)) {
             $this->buildQuery($query, $name, $search);
         } elseif (strpos($name, '.') !== false) {
             $parts = explode('.', $name);

@@ -6,17 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use SleepingOwl\Admin\Contracts\FormElementInterface;
 use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Traits\Assets;
 
 abstract class FormElement implements FormElementInterface
 {
     use Assets;
-
-    /**
-     * @var \SleepingOwl\Admin\Contracts\TemplateInterface
-     */
-    protected $template;
 
     /**
      * @var string|\Illuminate\View\View
@@ -39,22 +35,27 @@ abstract class FormElement implements FormElementInterface
     protected $modelConfiguration;
 
     /**
+     * @var MetaInterface
+     */
+    protected $meta;
+
+    /**
      * FormElement constructor.
      *
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      */
-    public function __construct(TemplateInterface $template)
+    public function __construct(MetaInterface $meta)
     {
-        $this->template = $template;
+        $this->meta = $meta;
         $this->initializePackage(
-            $this->template->meta()
+            $meta
         );
     }
 
     public function initialize()
     {
         $this->includePackage(
-            $this->template->meta()
+            $this->meta
         );
     }
 
@@ -208,7 +209,10 @@ abstract class FormElement implements FormElementInterface
      */
     public function render()
     {
-        return $this->template->view($this->getView(), $this->toArray())->render();
+        return $this
+            ->getModelConfiguration()
+            ->getTemplate()
+            ->view($this->getView(), $this->toArray());
     }
 
     /**

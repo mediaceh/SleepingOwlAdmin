@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use SleepingOwl\Admin\Contracts\Form\ElementsInterface;
 use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 
 class FormElements extends FormElement implements ElementsInterface
@@ -15,12 +16,12 @@ class FormElements extends FormElement implements ElementsInterface
     /**
      * Column constructor.
      *
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      * @param array $elements
      */
-    public function __construct(TemplateInterface $template, array $elements = [])
+    public function __construct(MetaInterface $meta, array $elements = [])
     {
-        parent::__construct($template);
+        parent::__construct($meta);
 
         $this->setElements($elements);
     }

@@ -94,7 +94,6 @@ class Range extends BaseColumnFilter
     }
 
     /**
-     * @param RepositoryInterface  $repository
      * @param NamedColumnInterface $column
      * @param Builder              $query
      * @param string               $search
@@ -103,7 +102,6 @@ class Range extends BaseColumnFilter
      * @return void
      */
     public function apply(
-        RepositoryInterface $repository,
         NamedColumnInterface $column,
         Builder $query,
         $search,
@@ -116,14 +114,14 @@ class Range extends BaseColumnFilter
             $this
                 ->getFrom()
                 ->setOperator(FilterInterface::GREATER_OR_EQUAL)
-                ->apply($repository, $column, $query, $from, $fullSearch);
+                ->apply($column->getModelConfiguration()->getRepository(), $column, $query, $from, $fullSearch);
         }
 
         if (! empty($to)) {
             $this
                 ->getTo()
                 ->setOperator(FilterInterface::LESS_OR_EQUAL)
-                ->apply($repository, $column, $query, $to, $fullSearch);
+                ->apply($column->getModelConfiguration()->getRepository(), $column, $query, $to, $fullSearch);
         }
     }
 }

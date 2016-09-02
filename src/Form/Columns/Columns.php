@@ -5,6 +5,7 @@ namespace SleepingOwl\Admin\Form\Columns;
 use Illuminate\Support\Collection;
 use KodiComponents\Support\HtmlAttributes;
 use SleepingOwl\Admin\Contracts\Form\Columns\ColumnInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Form\FormElements;
 
@@ -20,13 +21,13 @@ class Columns extends FormElements implements ColumnInterface
     /**
      * Columns constructor.
      *
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      * @param array $elements
      */
-    public function __construct(TemplateInterface $template, array $elements = [])
+    public function __construct(MetaInterface $meta, array $elements = [])
     {
         $this->elements = new Collection();
-        parent::__construct($template, $elements);
+        parent::__construct($meta, $elements);
     }
 
     /**
@@ -64,9 +65,9 @@ class Columns extends FormElements implements ColumnInterface
     public function addElement($element, $width = null)
     {
         if (is_callable($element)) {
-            $element = new Column($this->template, $element());
+            $element = new Column($this->meta, $element());
         } elseif (is_array($element)) {
-            $element = new Column($this->template, $element);
+            $element = new Column($this->meta, $element);
         }
 
         if (! ($element instanceof ColumnInterface)) {

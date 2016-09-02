@@ -4,6 +4,7 @@ namespace SleepingOwl\Admin\Form\Element;
 
 use Closure;
 use Illuminate\Http\Request;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Form\FormElement;
 
@@ -22,16 +23,16 @@ class Custom extends FormElement
     /**
      * Custom constructor.
      *
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      * @param Closure|null $callback
      */
-    public function __construct(TemplateInterface $template, Closure $callback = null)
+    public function __construct(MetaInterface $meta, Closure $callback = null)
     {
         if (! is_null($callback)) {
             $this->setCallback($callback);
         }
 
-        parent::__construct($template);
+        parent::__construct($meta);
     }
 
     /**

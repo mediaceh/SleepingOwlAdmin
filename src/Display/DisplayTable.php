@@ -5,9 +5,8 @@ namespace SleepingOwl\Admin\Display;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Renderable;
-use SleepingOwl\Admin\Contracts\AdminInterface;
 use SleepingOwl\Admin\Contracts\ColumnInterface;
-use SleepingOwl\Admin\Contracts\RepositoryInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Display\Column\Control;
 use SleepingOwl\Admin\Display\Extension\Columns;
 use SleepingOwl\Admin\Display\Extension\ColumnFilters;
@@ -63,16 +62,15 @@ class DisplayTable extends Display
     /**
      * Display constructor.
      *
-     * @param AdminInterface $admin
-     * @param RepositoryInterface $repository
+     * @param MetaInterface $meta
      * @param Control $control
      * @param Request $request
      *
      * @internal param TemplateInterface $template
      */
-    public function __construct(AdminInterface $admin, RepositoryInterface $repository, Control $control, Request $request)
+    public function __construct(MetaInterface $meta, Control $control, Request $request)
     {
-        parent::__construct($admin, $repository);
+        parent::__construct($meta);
 
         $this->request = $request;
 
@@ -96,6 +94,10 @@ class DisplayTable extends Display
         $this->getColumns()->all()->each(function(ColumnInterface $column) {
             $column->setModelConfiguration($this->getModelConfiguration());
         });
+
+        foreach ($this->getColumnFilters()->all() as $columnFilter) {
+            $columnFilter->setModelConfiguration($this->getModelConfiguration());
+        }
 
         $this->setHtmlAttribute('class', 'table table-striped');
     }
@@ -223,7 +225,7 @@ class DisplayTable extends Display
      */
     public function render()
     {
-        return $this->template->view($this->getView(), $this->toArray());
+        return $this->getTemplate()->view($this->getView(), $this->toArray());
     }
 
     /**
@@ -232,10 +234,6 @@ class DisplayTable extends Display
      */
     public function getCollection()
     {
-        if (! $this->isInitialized()) {
-            throw new \Exception('Display is not initialized');
-        }
-
         if (! is_null($this->collection)) {
             return $this->collection;
         }

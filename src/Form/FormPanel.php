@@ -76,7 +76,7 @@ class FormPanel extends FormDefault
             $items = func_get_args();
         }
 
-        $this->addElement(new Header($this->template, $items));
+        $this->addElement(new Header($this->meta, $items));
 
         return $this;
     }
@@ -93,11 +93,11 @@ class FormPanel extends FormDefault
         }
 
         if (get_class($this->getElements()->last()) === Body::class) {
-            $this->addElement(new Html($this->template, '<hr />'));
+            $this->addElement(new Html($this->meta, '<hr />'));
         }
 
         $this->addElement(
-            new Body($this->template, $items)
+            new Body($this->meta, $items)
         );
 
         return $this;
@@ -114,7 +114,7 @@ class FormPanel extends FormDefault
             $items = func_get_args();
         }
 
-        $this->addElement(new Footer($this->template, $items));
+        $this->addElement(new Footer($this->meta, $items));
 
         return $this;
     }

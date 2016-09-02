@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 
 class Images extends Image
 {
+    /**
+     * @param Request $request
+     */
     public function save(Request $request)
     {
         $name = $this->getName();

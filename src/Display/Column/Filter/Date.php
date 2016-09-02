@@ -157,7 +157,6 @@ class Date extends Text
     }
 
     /**
-     * @param RepositoryInterface  $repository
      * @param NamedColumnInterface $column
      * @param Builder              $query
      * @param string               $search
@@ -166,7 +165,6 @@ class Date extends Text
      * @return void
      */
     public function apply(
-        RepositoryInterface $repository,
         NamedColumnInterface $column,
         Builder $query,
         $search,
@@ -188,7 +186,7 @@ class Date extends Text
 
         $time = $time->format($this->getSearchFormat());
         $name = $column->getName();
-        if ($repository->hasColumn($name)) {
+        if ($column->getModelConfiguration()->getRepository()->hasColumn($name)) {
             $this->buildQuery($query, $name, $time);
         } elseif (strpos($name, '.') !== false) {
             $parts = explode('.', $name);

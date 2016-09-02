@@ -15,6 +15,7 @@ use SleepingOwl\Admin\Contracts\FormElementInterface;
 use SleepingOwl\Admin\Contracts\FormInterface;
 use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
 use SleepingOwl\Admin\Contracts\RepositoryInterface;
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Form\Element\Upload;
 
 class FormDefault extends FormElements implements DisplayInterface, FormInterface
@@ -31,12 +32,6 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
      * @var FormButtons
      */
     protected $buttons;
-
-    /**
-     * Form related repository.
-     * @var RepositoryInterface
-     */
-    protected $repository;
 
     /**
      * Form action url.
@@ -62,17 +57,6 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
     protected $id;
 
     /**
-     * Is form already initialized?
-     * @var bool
-     */
-    protected $initialized = false;
-
-    /**
-     * @var AdminInterface
-     */
-    protected $admin;
-
-    /**
      * @var UrlGenerator
      */
     protected $urlGenerator;
@@ -80,32 +64,24 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
     /**
      * FormDefault constructor.
      *
-     * @param AdminInterface $admin
+     * @param MetaInterface $meta
      * @param FormButtonsInterface $buttons
-     * @param RepositoryInterface $repository
      * @param UrlGenerator $urlGenerator
      * @param array $elements
      */
     public function __construct(
-        AdminInterface $admin,
+        MetaInterface $meta,
         FormButtonsInterface $buttons,
-        RepositoryInterface $repository,
         UrlGenerator $urlGenerator,
         array $elements = []
     )
     {
-        $this->admin = $admin;
-        $this->repository = $repository;
         $this->urlGenerator = $urlGenerator;
 
-        parent::__construct($admin->template(), $elements);
+        parent::__construct($meta, $elements);
 
         $this->setButtons(
             $buttons
-        );
-
-        $this->initializePackage(
-            $this->template->meta()
         );
     }
 
@@ -114,14 +90,8 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
      */
     public function initialize()
     {
-        if ($this->initialized) {
-            return;
-        }
-
-        $this->initialized = true;
-
         $this->setModel(
-            $this->repository->getModel()
+            $this->getModelConfiguration()->getModel()
         );
 
         parent::initialize();
@@ -136,10 +106,6 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
 
         $this->getButtons()->setModelConfiguration(
             $this->getModelConfiguration()
-        );
-
-        $this->includePackage(
-            $this->template->meta()
         );
     }
 
@@ -168,27 +134,7 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
      */
     public function getRepository()
     {
-        return $this->repository;
-    }
-
-    /**
-     * @return string|\Illuminate\View\View
-     */
-    public function getView()
-    {
-        return $this->view;
-    }
-
-    /**
-     * @param \Illuminate\View\View|string $view
-     *
-     * @return $this
-     */
-    public function setView($view)
-    {
-        $this->view = $view;
-
-        return $this;
+        return $this->getModelConfiguration()->getRepository();
     }
 
     /**
@@ -222,11 +168,7 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
      */
     public function setModelConfiguration(ModelConfigurationInterface $model)
     {
-        parent::setModelConfiguration($model);
-
-        $this->repository->setClass($model->getClass());
-
-        return $this;
+        return parent::setModelConfiguration($model);
     }
 
     /**
@@ -281,14 +223,6 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
             $this->id = $id;
             $this->setModel($model);
         }
-    }
-
-    /**
-     * @return Model
-     */
-    public function getModel()
-    {
-        return $this->model;
     }
 
     /**
@@ -421,21 +355,5 @@ class FormDefault extends FormElements implements DisplayInterface, FormInterfac
             'buttons' => $this->getButtons(),
             'backUrl' => session('_redirectBack', $this->urlGenerator->previous()),
         ];
-    }
-
-    /**
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
-     */
-    public function render()
-    {
-        return $this->template->view($this->getView(), $this->toArray());
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->render();
     }
 }

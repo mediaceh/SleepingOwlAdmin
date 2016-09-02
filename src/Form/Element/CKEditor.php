@@ -2,6 +2,7 @@
 
 namespace SleepingOwl\Admin\Form\Element;
 
+use SleepingOwl\Admin\Contracts\Template\MetaInterface;
 use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 use SleepingOwl\Admin\Contracts\Wysiwyg\WysiwygMangerInterface;
 
@@ -14,13 +15,13 @@ class CKEditor extends Wysiwyg
     protected $view = 'form.element.wysiwyg';
 
     /**
-     * @param TemplateInterface $template
+     * @param MetaInterface $meta
      * @param WysiwygMangerInterface $manger
      * @param string $path
      * @param string|null $label
      */
-    public function __construct(TemplateInterface $template, WysiwygMangerInterface $manger, $path, $label = null)
+    public function __construct(MetaInterface $meta, WysiwygMangerInterface $manger, $path, $label = null)
     {
-        parent::__construct($template, $manger, $path, $label, 'ckeditor');
+        parent::__construct($meta, $manger, $path, $label, 'ckeditor');
     }
 }
